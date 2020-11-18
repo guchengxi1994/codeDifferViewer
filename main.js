@@ -5,12 +5,13 @@
  * @Author: xiaoshuyui
  * @Date: 2020-11-17 10:09:52
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2020-11-17 14:04:36
+ * @LastEditTime: 2020-11-18 09:33:05
  */
 // var app = require('app');  // 控制应用生命周期的模块。
 // var BrowserWindow = require('browser-window');  // 创建原生浏览器窗口的模块
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
+const ipc = require('electron').ipcMain
 
 // 保持一个对于 window 对象的全局引用，不然，当 JavaScript 被 GC，
 // window 会被自动地关闭
@@ -40,7 +41,7 @@ app.on('ready', function () {
   mainWindow.loadURL('file://' + __dirname + '/index.html');
 
   // 打开开发工具
-  mainWindow.openDevTools();
+  // mainWindow.openDevTools();
 
   // 当 window 被关闭，这个事件会被发出
   mainWindow.on('closed', function () {
@@ -51,3 +52,16 @@ app.on('ready', function () {
   });
 
 });
+
+let newwin;
+
+ipc.on('openhtml',()=>{
+  newwin = new BrowserWindow({
+    width: 1500, 
+    height: 800,
+    frame:true,
+    parent: mainWindow, //win是主窗口
+})
+newwin.loadURL(path.join('file:',__dirname,'/cache/diff.html')); //new.html是新开窗口的渲染进程
+newwin.on('closed',()=>{newwin = null})
+})
